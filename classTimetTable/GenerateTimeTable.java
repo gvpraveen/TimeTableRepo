@@ -3,12 +3,18 @@ package com.classTimetTable;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
@@ -85,7 +91,7 @@ public class GenerateTimeTable {
 String classArray[] = {"10th","9th","8th","6th"};
 for(String classEach : classArray) {
 	List<String> TenthList = (List) m.get(classEach);
-	Map tenthFinalMap = new HashMap<>();
+	Map<String,List<Map<String,String>>> tenthFinalMap = new HashMap<>();
 	for (String e : TenthList) {
 
 		String data[] = e.split("\\@");
@@ -125,11 +131,70 @@ for(String classEach : classArray) {
 	}
 	System.out.println("=========="+classEach+"=================");
 	System.out.println(tenthFinalMap);
+	InsertIntoDb(tenthFinalMap,classEach);
 }
 } catch (IOException e) {
 			e.printStackTrace();
 }
 
+	}
+
+	private static void InsertIntoDb(Map<String,List<Map<String,String>>> tenthFinalMap, String classEach) {
+		   final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+		   final String DB_URL = "jdbc:mysql://localhost/TimeTable";
+
+		   //  Database credentials
+		   final String USER = "root";
+		   final String PASS = "";
+		   
+		  
+		   Connection conn = null;
+		   PreparedStatement stmt = null;
+		   try{
+		      Class.forName("com.mysql.jdbc.Driver");
+		      conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		      
+		      
+		      for(Entry<String,List<Map<String,String>>> entry : tenthFinalMap.entrySet()) {
+		    	   String key = entry.getKey();
+		    	  for (Map<String, String> entry1 : entry.getValue()) {
+		    		  for(Entry<String, String> entry2 : entry1.entrySet()) {
+		    			  String time = entry2.getKey();
+		    			  String sub = entry2.getValue();
+		    			  String sql = "INSERT INTO class_timetable (time,class,day,subject)" +
+				                   "VALUES (?, ?, ?, ?)";
+		    			  
+		    			   stmt=conn.prepareStatement(sql);  
+		    			  stmt.setString(1,time);
+		    			  stmt.setString(2,classEach);  
+		    			  stmt.setString(3,key);
+		    			  stmt.setString(4,sub);  
+		    			  
+		    			  stmt.executeUpdate();  
+				    	
+		    		  }
+		    	  }
+		    	}
+		      
+		   }catch(SQLException se){
+		     se.printStackTrace();
+		   }catch(Exception e){
+		       e.printStackTrace();
+		   }finally{
+		      try{
+		         if(stmt!=null)
+		            conn.close();
+		      }catch(SQLException se){
+		      }try{
+		         if(conn!=null)
+		            conn.close();
+		      }catch(SQLException se){
+		         se.printStackTrace();
+		      }
+		   }
+		   
+		
+		
 	}
 
 }
