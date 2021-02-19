@@ -88,8 +88,9 @@ public class GenerateTimeTable {
 				List<String> clas = Arrays.asList(s);
 				m.put(k, clas);
 			});
+			
 String classArray[] = {"","10th","9th","8th","7th","6th"};
-Map allList = new HashMap<>();
+Map finalMap = new HashMap<>();
 for(String classEach : classArray) {
 	List<String> TenthList = (List) m.get(classEach);
 	Map<String,List<Map<String,String>>> tenthFinalMap = new HashMap<>();
@@ -131,20 +132,25 @@ for(String classEach : classArray) {
 			tenthList.add(timeSub);
 			tenthFinalMap.put(data[1], tenthList);
 		}
-
+		//tenthFinalMap.get(data[1]).
 	}
 	if("".equals(classEach)) {
 		classEach = "Leasure";
 	}
-	System.out.println("=========="+classEach+"=================");
-	System.out.println(tenthFinalMap);
-	InsertIntoDb(tenthFinalMap,classEach);
+	//System.out.println("=========="+classEach+"=================");
+	//System.out.println(tenthFinalMap);
+	finalMap.put(classEach,tenthFinalMap);
+	//InsertIntoDb(tenthFinalMap,classEach);
 }
+
+AssignCoTeacher assignCoTeacher = new AssignCoTeacher();
+
+assignCoTeacher.assigTeacher(finalMap);
+
 } catch (IOException e) {
 			e.printStackTrace();
 }
-
-	}
+}
 
 	private static void InsertIntoDb(Map<String,List<Map<String,String>>> tenthFinalMap, String classEach) {
 		   final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
@@ -171,7 +177,7 @@ for(String classEach : classArray) {
 		    			  String sql = "INSERT INTO class_timetable (time,class,day,subject)" +
 				                   "VALUES (?, ?, ?, ?)";
 		    			  
-		    			   stmt=conn.prepareStatement(sql);  
+		    			  stmt=conn.prepareStatement(sql);  
 		    			  stmt.setString(1,time);
 		    			  stmt.setString(2,classEach);  
 		    			  stmt.setString(3,key);
