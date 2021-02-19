@@ -88,7 +88,8 @@ public class GenerateTimeTable {
 				List<String> clas = Arrays.asList(s);
 				m.put(k, clas);
 			});
-String classArray[] = {"10th","9th","8th","6th"};
+String classArray[] = {"","10th","9th","8th","7th","6th"};
+Map allList = new HashMap<>();
 for(String classEach : classArray) {
 	List<String> TenthList = (List) m.get(classEach);
 	Map<String,List<Map<String,String>>> tenthFinalMap = new HashMap<>();
@@ -113,6 +114,9 @@ for(String classEach : classArray) {
 		else if (data[1].equals("6")) {
 			data[1] = "Saturday";
 		}
+		else if (data[1].equals("")) {
+			data[1] = "leasure";
+		}
 		
 		if (tenthFinalMap.containsKey(data[1])) {
 			List tenthList = (List) tenthFinalMap.get(data[1]);
@@ -128,6 +132,9 @@ for(String classEach : classArray) {
 			tenthFinalMap.put(data[1], tenthList);
 		}
 
+	}
+	if("".equals(classEach)) {
+		classEach = "Leasure";
 	}
 	System.out.println("=========="+classEach+"=================");
 	System.out.println(tenthFinalMap);
